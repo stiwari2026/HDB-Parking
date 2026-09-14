@@ -1,4 +1,4 @@
-# Master Prompt — HDB Live Parking
+# Master Prompt — HDB Live Parking by Sanesh Tiwari
 
 The initial prompt given to Google AI Studio at the start of the build.
 
