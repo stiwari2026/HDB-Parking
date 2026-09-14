@@ -14,31 +14,33 @@ export default async function handler(req, res) {
     res.end(JSON.stringify(data));
   };
 
-  // 1. BEFORE the fetch: verify credential early before making any upstream call.
-  // A missing variable sent as "undefined" or empty string is stopped immediately.
+  // 1. BEFORE the fetch: read the credential, but do not block on it.
+  // data.gov.sg serves this endpoint without a key; the key only raises the
+  // rate limit. A variable that was never set arrives as undefined or the
+  // string "undefined", so treat those as absent rather than sending them.
   const apiKey = process.env.HDB_Parking;
-
-  if (!apiKey || apiKey.trim() === '' || apiKey === 'undefined') {
-    return send(503, {
-      error: 'Service Unavailable: HDB_Parking credential is not configured or empty',
-      variable: 'HDB_Parking',
-      configured: false
-    });
-  }
+  const hasKey =
+    typeof apiKey === 'string' &&
+    apiKey.trim() !== '' &&
+    apiKey.trim() !== 'undefined';
 
   // 2. Fetch live data from data.gov.sg upstream API
+  const headers = { Accept: 'application/json' };
+  if (hasKey) {
+    headers['x-api-key'] = apiKey.trim();
+  }
+
   let upstreamResponse;
   try {
     upstreamResponse = await fetch(
       'https://api.data.gov.sg/v1/transport/carpark-availability',
       {
         method: 'GET',
-        headers: {
-          'x-api-key': apiKey,
-          'AccountKey': apiKey,
-          Accept: 'application/json'
-        },
-        signal: typeof AbortSignal.timeout === 'function' ? AbortSignal.timeout(8000) : undefined
+        headers,
+        signal:
+          typeof AbortSignal.timeout === 'function'
+            ? AbortSignal.timeout(8000)
+            : undefined
       }
     );
   } catch (networkError) {
@@ -48,21 +50,28 @@ export default async function handler(req, res) {
     });
   }
 
-  // 3. AFTER the fetch: inspect response.ok before attempting to read body
+  // 3. AFTER the fetch: inspect response.ok before attempting to read body.
+  // The body is deliberately NOT echoed back. Some gateways repeat the
+  // rejected key in their error text, which would put the credential in a
+  // client response. Map the status to our own wording instead.
   if (!upstreamResponse.ok) {
-    let reason = `Upstream refused request with HTTP ${upstreamResponse.status}`;
-    try {
-      const errorText = await upstreamResponse.text();
-      if (errorText && errorText.trim().length > 0) {
-        reason = `Upstream error ${upstreamResponse.status}: ${errorText.trim().slice(0, 150)}`;
-      }
-    } catch {
-      // Empty refusal body is handled safely without throwing
+    const status = upstreamResponse.status;
+    let reason;
+
+    if (status === 401 || status === 403) {
+      reason = `Upstream rejected the request (${status}). The configured key is not being accepted.`;
+    } else if (status === 429) {
+      reason = 'Upstream rate limit reached (429). Too many requests in the last minute.';
+    } else if (status >= 500) {
+      reason = `Upstream is failing on its own side (${status}).`;
+    } else {
+      reason = `Upstream refused the request with HTTP ${status}.`;
     }
 
-    return send(upstreamResponse.status, {
+    return send(status, {
       error: 'Upstream refused',
-      upstreamStatus: upstreamResponse.status,
+      upstreamStatus: status,
+      keyConfigured: hasKey,
       reason
     });
   }
@@ -80,7 +89,9 @@ export default async function handler(req, res) {
 
   const items = Array.isArray(rawData?.items) ? rawData.items : [];
   const primaryItem = items[0] || {};
-  const rawCarparks = Array.isArray(primaryItem.carpark_data) ? primaryItem.carpark_data : [];
+  const rawCarparks = Array.isArray(primaryItem.carpark_data)
+    ? primaryItem.carpark_data
+    : [];
 
   // Filter and extract only necessary fields for the screen
   const carparks = rawCarparks.map((item) => {
