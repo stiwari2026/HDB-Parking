@@ -7,6 +7,7 @@ import {
 import { Header } from './components/Header';
 import { StandardCarparksScreen } from './components/StandardCarparksScreen';
 import { HeavyVehicleScreen } from './components/HeavyVehicleScreen';
+import { DisqusComments } from './components/DisqusComments';
 import {
   Navigation,
   X,
@@ -298,6 +299,9 @@ export default function App() {
           />
         )}
       </main>
+
+      {/* Visitor feedback thread (single Disqus thread for the home page) */}
+      <DisqusComments />
 
       {/* Mandatory Provider Attribution Footer (Singapore Open Data Licence) */}
       <footer className="bg-slate-950 border-t border-slate-800/80 px-3 sm:px-4 py-2 text-[11px] sm:text-xs text-slate-400 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 shrink-0">
