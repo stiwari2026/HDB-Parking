@@ -36,12 +36,14 @@ export function DisqusComments() {
   return (
     <section
       id="feedback-comments"
-      className="bg-slate-950 border-t border-slate-800/80 px-3 sm:px-4 py-3 max-h-[40vh] overflow-y-auto shrink-0"
+      className="border-t border-slate-800/80 px-3 sm:px-4 py-3 max-h-[40vh] overflow-y-auto shrink-0"
+      // Disqus cannot parse Tailwind v4's oklch() colors, so give it plain rgb values to read
+      style={{ backgroundColor: 'rgb(2, 6, 23)', color: 'rgb(203, 213, 225)' }}
     >
       <p className="text-xs sm:text-sm text-slate-300 mb-2">
         Tried the app? Tell us what worked for you and what did not.
       </p>
-      <div id="disqus_thread" />
+      <div id="disqus_thread" style={{ color: 'rgb(203, 213, 225)' }} />
     </section>
   );
 }
