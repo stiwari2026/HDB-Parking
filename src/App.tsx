@@ -319,6 +319,38 @@ export default function App() {
             Singapore Open Data Licence version 1.0
           </a>
           .
+          <p className="mt-1">
+            This page uses Microsoft Clarity and Disqus, which use cookies to record how visitors
+            use the site and to host comments. By using this page you agree that we and Microsoft
+            may collect and use this data. See the{' '}
+            <a
+              href="https://www.microsoft.com/privacy/privacystatement"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-300 underline hover:text-white"
+            >
+              Microsoft Privacy Statement
+            </a>
+            , the{' '}
+            <a
+              href="https://disqus.com/privacy-policy/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-300 underline hover:text-white"
+            >
+              Disqus privacy policy
+            </a>{' '}
+            and the{' '}
+            <a
+              href="https://disqus.com/data-sharing-settings/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-300 underline hover:text-white"
+            >
+              Disqus data sharing settings
+            </a>
+            .
+          </p>
         </div>
         <div className="text-[10px] text-slate-500 whitespace-nowrap">
           HDB Electronic Parking System (EPS)
