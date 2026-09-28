@@ -194,7 +194,9 @@ export default function App() {
   const totalAvailableLots = currentDataset.reduce((sum, c) => sum + c.availableLots, 0);
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-950 text-slate-100 font-sans">
+    <div className="flex flex-col min-h-screen w-full bg-slate-950 text-slate-100 font-sans">
+      {/* App area fills exactly one screen; comments and footer sit below it and are reached by scrolling */}
+      <div className="flex flex-col h-screen overflow-hidden shrink-0">
       {/* Navigation & Header */}
       <Header
         activeScreen={activeScreen}
@@ -299,6 +301,7 @@ export default function App() {
           />
         )}
       </main>
+      </div>
 
       {/* Visitor feedback thread (single Disqus thread for the home page) */}
       <DisqusComments />
