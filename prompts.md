@@ -111,3 +111,63 @@ How to check quickly (under an hour):
 3. Compare each point's plotted position with its true position, relative to known landmarks or to the other points.
 
 You could also give 3 to 5 drivers one task: "pick the nearest carpark to [a place you know] using only the map." Then count how many choose wrongly. This would test B's predicted cost directly.
+
+---
+
+## Revision prompts: comment section crowds out the map
+
+Finding: the comment section takes space the map needs (heuristic 8, Aesthetic and Minimalist Design), raised by 2 of 3 groupmates at severities 4 and 3.
+
+### First revision (later replaced)
+
+My prompt:
+
+> Yes please, make it ready for it to be committed
+
+This followed the agent's offer to make the comment section collapsible. The agent made it closed by default, loading Disqus only the first time it is opened. Measured on a 375 × 812 phone, the map area went from 104 px to 384 px with the comments closed.
+
+### Arguments against the repair
+
+My prompt:
+
+> ROLE: You are a sceptical senior developer and usability reviewer working in my existing project. Before you write any code, your job is to argue against the repair I propose.
+>
+> CONTEXT: Live address, who the product is for, the finding in its six lines, the evidence behind it, the repair I propose.
+>
+> GOAL: Argue against my repair.
+> 1. Does it solve the problem the finding describes, or a problem I already believed I had? Say which, and why.
+> 2. Does the problem belong to the screen or to the system, and does my repair sit in the right half?
+> 3. Name one heuristic this repair could break while it serves the one above, and how.
+> 4. Propose the smallest alternative that would make the same thing true.
+> 5. Tell me exactly what to do on the live address to check that the repair worked.
+>
+> OUTPUT: Your arguments first, as a numbered list. Then stop. Write no code until I reply with the repair I have chosen.
+>
+> GUARDRAILS: Do not tell me the repair is good. If you have no strong reason to doubt it, say so plainly instead of inventing one. When I do ask you to build, change only what the repair needs. Do not remove Disqus or the privacy notice, and do not break /api/health.
+
+I sent the template with its context lines still blank. The agent asked which finding and repair I meant, and I replied:
+
+> Lets go with "Comment section crowds out the map", looks like the easiest for me to tackle
+
+The agent's arguments, against the collapsible repair already live (it noted that this made the argument come after the code, not before it):
+
+1. **It solves the problem as the groupmates stated it, but only while the section is closed.** The whole page is locked to one screen height (`h-screen overflow-hidden` in `App.tsx`) and never scrolls, so anything added takes space from the map. The moment someone clicks Show comments, the thread takes up to 40% of the screen and the map shrinks again. The repair copied Kevin's suggested fix ("make it collapsible") rather than the cause; Kartik's first suggestion, putting the comments underneath the full map, goes after the cause.
+2. **Screen or system: it is a screen problem, and the repair sits on the screen.** No strong reason to doubt this part.
+3. **It can break #1 Visibility of System Status.** Closed, the bar gives no sign that comments exist, and Disqus loads only after a click, so a visitor cannot tell whether anyone has commented. Fewer people will open it, which means less feedback. It also leaves a 45 px bar on screen permanently.
+4. **Smallest alternative: let the page scroll.** Give the map section a full screen height and put the comments and footer below it. The map is never squeezed, and the thread stays visible to anyone who scrolls. The risk to test is that scrolling the page might fight with dragging the map on a phone.
+5. **How to check on the live site:** in Chrome DevTools at 375 × 812, note the height of `<main>` with comments closed and then open; repeat at 1280 × 800; confirm in the Network tab that `embed.js` loads once; confirm `/api/health` still returns 200.
+
+The agent offered three options: keep the collapsible repair, switch to the scrolling layout, or combine them (scrolling plus a comment count on the bar).
+
+### Arguments I turned down
+
+- **Keep the collapsible repair:** turned down, because of argument 1 (the problem returns whenever the comments are open) and argument 3 (hidden comments mean less feedback).
+- **Combine scrolling with a comment count on the bar:** turned down. Once the comments sit below the map, there is no bar to put a count on, so it adds work without serving the finding.
+
+### Second revision (live)
+
+My prompt:
+
+> I chose to switch to the scrolling layout in argument 4
+
+The agent wrapped the header, status banner and map in a container exactly one screen tall, let the page scroll, and put the comments and footer below it. It removed the collapse button and the 40% height cap from the comments. Disqus, the privacy notice and `/api/health` were left unchanged. Measured on the built site, the map area went from 104 px to 612 px on a 375 × 812 phone, and from 509 px to 633 px on a 1280 × 800 desktop. On both, the comments start exactly at the bottom edge of the screen.
