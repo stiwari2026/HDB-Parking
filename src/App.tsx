@@ -130,6 +130,7 @@ export default function App() {
             const carLot = live.lots.find((l) => l.lot_type === 'C');
             const motoLot = live.lots.find((l) => l.lot_type === 'Y');
             return {
+              isLive: !!carLot,
               ...item,
               availableLots:
                 carLot && typeof carLot.lots_available === 'number'
@@ -156,6 +157,7 @@ export default function App() {
           if (live && live.lots) {
             const heavyLot = live.lots.find((l) => l.lot_type === 'H');
             return {
+              isLive: !!heavyLot,
               ...item,
               availableLots:
                 heavyLot && typeof heavyLot.lots_available === 'number'
@@ -192,6 +194,7 @@ export default function App() {
   // Calculate totals for active screen badges
   const currentDataset = activeScreen === 'standard' ? standardData : heavyData;
   const totalAvailableLots = currentDataset.reduce((sum, c) => sum + c.availableLots, 0);
+  const liveCarparksCount = currentDataset.filter((c) => c.isLive).length;
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-slate-950 text-slate-100 font-sans">
@@ -205,6 +208,7 @@ export default function App() {
         isSimulatingRefresh={feedStatus === 'loading'}
         totalAvailable={totalAvailableLots}
         totalCarparksCount={currentDataset.length}
+        liveCarparksCount={liveCarparksCount}
       />
 
       {/* Feed Status Banner (Four distinct sentences for: loading, empty, refused, unreachable) */}
@@ -241,6 +245,12 @@ export default function App() {
 
           <span className="leading-snug">
             {STATUS_SENTENCES[feedStatus]}
+            {feedStatus === 'success' && (
+              <span className="ml-1.5">
+                {liveCarparksCount} of {currentDataset.length} carparks are live; the rest show
+                sample data.
+              </span>
+            )}
             {feedStatus === 'success' && lastSyncTime && (
               <span className="text-emerald-300 ml-1.5 opacity-90 font-mono text-xs">
                 ({lastSyncTime})

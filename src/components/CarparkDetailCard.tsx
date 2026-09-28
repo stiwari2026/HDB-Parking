@@ -187,7 +187,14 @@ export const CarparkDetailCard: React.FC<CarparkDetailCardProps> = ({
           <span className="font-bold text-slate-100">{carpark.rates}</span>
         </div>
         <div className="text-[11px] text-slate-400">
-          Last sensor ping: <span className="text-slate-300">{carpark.lastUpdated}</span>
+          {carpark.isLive ? (
+            <>
+              <span className="font-semibold text-emerald-400">Live</span> · updated{' '}
+              <span className="text-slate-300">{carpark.lastUpdated}</span>
+            </>
+          ) : (
+            <span className="font-semibold text-amber-400">Sample data, not live</span>
+          )}
         </div>
       </div>
 

@@ -171,3 +171,25 @@ My prompt:
 > I chose to switch to the scrolling layout in argument 4
 
 The agent wrapped the header, status banner and map in a container exactly one screen tall, let the page scroll, and put the comments and footer below it. It removed the collapse button and the 40% height cap from the comments. Disqus, the privacy notice and `/api/health` were left unchanged. Measured on the built site, the map area went from 104 px to 612 px on a 375 × 812 phone, and from 509 px to 633 px on a 1280 × 800 desktop. On both, the comments start exactly at the bottom edge of the screen.
+
+---
+
+## Revision prompts: carparks shown as "live" that are not in the live feed
+
+Finding: most carparks on the map are not in the live feed, yet the header says "EPS LIVE FEED" (heuristic 1, Visibility of System Status), raised by 1 of 3 groupmates at severity 4. The finding's own repair allows either real carparks from the feed or "clearly labelled as sample data".
+
+The agent pointed out that the checklist requires every finding rated 4 to be repaired, and offered two options: a quick repair that labels each carpark as live or sample, or taking the finding to the blind arbiter. It recommended the quick repair, because the evidence behind the 4 was strong.
+
+My prompt:
+
+> Go ahead with the quick repair
+
+I did not run the arguments-against prompt on this repair first.
+
+What the agent changed:
+- Each carpark is marked live only when the live feed returned figures for it; every other carpark counts as sample data.
+- The header no longer says "EPS LIVE FEED" for everything. It says "LIVE: N of M carparks • rest are sample data", or "SAMPLE DATA" when no carpark is live.
+- After a successful sync, the status banner adds "N of M carparks are live; the rest show sample data."
+- On the carpark card, "Last sensor ping: 1 min ago" is replaced by "Live · updated [time]" for live carparks, and "Sample data, not live" for the rest.
+
+Checked on the built site with a test feed that returned only TM21: the header read "LIVE: 1 of 20 carparks", the banner read "1 of 20 carparks are live; the rest show sample data.", and the BS14 card read "Sample data, not live". With no feed, the header read "SAMPLE DATA". Disqus and the privacy notice were unchanged.

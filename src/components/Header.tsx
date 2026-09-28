@@ -9,6 +9,7 @@ interface HeaderProps {
   isSimulatingRefresh: boolean;
   totalAvailable: number;
   totalCarparksCount: number;
+  liveCarparksCount: number;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -18,6 +19,7 @@ export const Header: React.FC<HeaderProps> = ({
   isSimulatingRefresh,
   totalAvailable,
   totalCarparksCount,
+  liveCarparksCount,
 }) => {
   return (
     <header className="bg-slate-900 text-white border-b border-slate-800 shrink-0 sticky top-0 z-30 shadow-md">
@@ -32,10 +34,23 @@ export const Header: React.FC<HeaderProps> = ({
               HDB Live Parking
             </h1>
             <div className="flex items-center space-x-1.5 text-[11px] text-slate-400">
-              <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="font-medium text-emerald-400">EPS LIVE FEED</span>
-              <span>•</span>
-              <span>{totalCarparksCount} carparks tracked</span>
+              {liveCarparksCount > 0 ? (
+                <>
+                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="font-medium text-emerald-400">
+                    LIVE: {liveCarparksCount} of {totalCarparksCount} carparks
+                  </span>
+                  <span>•</span>
+                  <span>rest are sample data</span>
+                </>
+              ) : (
+                <>
+                  <span className="inline-block w-2 h-2 rounded-full bg-amber-400" />
+                  <span className="font-medium text-amber-400">SAMPLE DATA</span>
+                  <span>•</span>
+                  <span>{totalCarparksCount} carparks, none live</span>
+                </>
+              )}
             </div>
           </div>
         </div>

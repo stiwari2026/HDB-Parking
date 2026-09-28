@@ -33,6 +33,7 @@ export interface CarparkItem {
   y: number; // 0-100% on schematic map
   features: string[];
   lastUpdated: string;
+  isLive?: boolean; // true only when the live feed returned this carpark
 }
 
 export type ActiveScreen = 'standard' | 'heavy';
