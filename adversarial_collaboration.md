@@ -51,11 +51,15 @@ Two predictions broke. The first was the mixed time formats ("1 min ago" next to
 
 ## Q3. Which groupmate finding did I nearly dismiss, and what did the evidence say?
 
-I nearly dismissed Sean's finding that most of the carparks on my map are not in the live feed, because the banner said the sync had succeeded. When I checked the code, all 20 carparks and their lot figures are built into the app. Only carparks whose codes happen to appear in the feed are ever updated, and the rest keep the same numbers on every reload. Sean was right, and the "EPS LIVE FEED" label hides it.
+I nearly dismissed Sean's finding that most of the carparks on my map are not in the live feed, because the banner said the sync had succeeded. When I checked the code, all 20 carparks and their lot figures are built into the app. Only carparks whose codes happen to appear in the feed are ever updated, and the rest keep the same numbers on every reload. After I labelled each carpark as live or sample data, my own live site showed "LIVE: 3 of 20 carparks", the same count Sean found. Sean was right, and the old "EPS LIVE FEED" label had hidden it.
 
 ## Q4. What did I revise, which heuristic does it serve, and how do I know it worked?
 
-I made the comment section collapsible and closed by default, so it shows as one slim bar under the map until a visitor opens it. It serves #8 Aesthetic and Minimalist Design, the problem Kartik and Kevin raised. I measured the map area on a 375 × 812 phone screen: it was 104 px tall with the comments open, and 384 px with them closed. That is almost four times as much room for the map.
+I made two revisions, one for each finding rated 4.
+
+The first serves #8 Aesthetic and Minimalist Design, for the comment section crowding out the map (Kartik 4, Kevin 3). I first made the comments collapsible. When my coding agent argued against that repair, it pointed out that the map shrank again as soon as the comments were opened, because the page was locked to one screen height. So I replaced it with a scrolling layout: the header and map now fill exactly one screen, and the comments and footer sit below it. I know it worked because I measured the map area. On a 375 × 812 phone it went from 104 px to 612 px, and on a 1280 × 800 desktop from 509 px to 633 px. On both, the comments start exactly at the bottom edge of the screen.
+
+The second serves #1 Visibility of System Status, for carparks shown as live when they are not (Sean 4). Each carpark is now marked live only when the feed returns figures for it. The header says how many are live, and every other card says "Sample data, not live" instead of "Last sensor ping: 1 min ago". I know it worked because the live site now reads "LIVE: 3 of 20 carparks • rest are sample data", and the BS14 card, which is not in the feed, says "Sample data, not live".
 
 ## Q5. What did my users give me that I could not have found myself?
 
